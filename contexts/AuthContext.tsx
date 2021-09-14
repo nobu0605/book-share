@@ -10,6 +10,9 @@ const initialState = {
   isLoading: true,
 }
 
+// We can add the routes we don't want to check authentication.
+const urlsWithoutAuth = ["/", "/register", "/completed"]
+
 const AuthProvider: FC = ({ children }) => {
   const router = useRouter()
   const [state, dispatch] = useReducer(AuthReducer, initialState)
@@ -19,8 +22,7 @@ const AuthProvider: FC = ({ children }) => {
   }, [router.pathname])
 
   function checkAuth() {
-    // We can add the routes we don't want to check authentication.
-    if (router.pathname === "/") {
+    if (urlsWithoutAuth.includes(router.pathname)) {
       return
     }
 
