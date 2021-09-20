@@ -37,4 +37,4 @@ yarn-error.log*
 /public/post-image/*
 !/public/post-image/dummy.txt
 /public/profile-image/*
-!/public/profile-image/dummy.txt
+!/public/profile-image/default-profile-image.png
