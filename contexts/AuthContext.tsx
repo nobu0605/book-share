@@ -15,7 +15,7 @@ const urlsWithoutAuth = ["/", "/register", "/completed"]
 
 const AuthProvider: FC = ({ children }) => {
   const router = useRouter()
-  const [state, dispatch] = useReducer(AuthReducer, initialState)
+  const [authState, dispatch] = useReducer(AuthReducer, initialState)
 
   useEffect(() => {
     checkAuth()
@@ -36,7 +36,7 @@ const AuthProvider: FC = ({ children }) => {
         uid,
       })
       .then((response: any) => {
-        state["user"] = response.data
+        authState["user"] = response.data
         dispatch({ type: "FETCH_SUCCESS" })
       })
       .catch((e) => {
@@ -45,7 +45,7 @@ const AuthProvider: FC = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ state, dispatch }}>
+    <AuthContext.Provider value={{ authState, dispatch }}>
       {children}
     </AuthContext.Provider>
   )

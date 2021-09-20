@@ -1,0 +1,96 @@
+@import "../variables";
+
+.post-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: white;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 15px;
+
+  .post-user-section {
+    width: 100%;
+    text-align: left;
+    color: black;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .post-user-section-left {
+    display: flex;
+    align-items: center;
+  }
+
+  .post-user-section__name {
+    font-size: 15px;
+    margin-left: 10px;
+  }
+
+  .post-dropdown {
+    height: 30px;
+  }
+
+  .post-content {
+    font-size: 15px;
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    line-height: 1.1;
+    color: black;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.edit-modal {
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  height: 350px;
+  font-size: 15px;
+
+  .edit-modal__title {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .edit-modal__circle {
+    text-align: right;
+    font-size: 15px;
+  }
+  .edit-modal__circle-icon {
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+  }
+
+  .edit-modal__profile {
+    text-align: left;
+    color: black;
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .edit-modal__profile-name {
+    font-size: 15px;
+    margin-left: 10px;
+  }
+
+  .edit-modal__input {
+    margin-bottom: 15px;
+    height: 200px;
+    border: 1px solid rgb(221, 221, 221);
+  }
+
+  .edit-modal__button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
