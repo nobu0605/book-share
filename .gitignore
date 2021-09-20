@@ -32,3 +32,9 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# public
+/public/post-image/*
+!/public/post-image/dummy.txt
+/public/profile-image/*
+!/public/profile-image/dummy.txt
