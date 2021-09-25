@@ -43,6 +43,24 @@
     display: flex;
     flex-direction: column;
   }
+
+  .liked-count {
+    margin-left: 5px;
+  }
+
+  .liked-heart {
+    width: 15px;
+    height: 15px;
+    color: rgb(249, 24, 128);
+    cursor: pointer;
+  }
+
+  .heart {
+    width: 15px;
+    height: 15px;
+    color: rgb(83, 100, 113);
+    cursor: pointer;
+  }
 }
 
 .edit-modal {

@@ -9,8 +9,9 @@ import { isEmpty } from "../utils/validations"
 import { AuthContext } from "../contexts/AuthContext"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { library } from "@fortawesome/fontawesome-svg-core"
-import { faTimesCircle } from "@fortawesome/free-solid-svg-icons"
-library.add(faTimesCircle)
+import { faTimesCircle, faHeart } from "@fortawesome/free-solid-svg-icons"
+import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons"
+library.add(faTimesCircle, faHeart, farHeart)
 
 type Props = {
   userId: number
@@ -19,12 +20,15 @@ type Props = {
   postContent: string
   postImage: string
   profileImage: string
-  getTimelines: () => void
+  likedCount: number
+  alreadyLiked: boolean
+  getTimelines: (authUserId: number) => void
   setIsDoneDeleting: (isDoneDeleting: boolean) => void
 }
 
 export default function Post(props: Props): JSX.Element {
   const { authState } = useContext(AuthContext)
+  const authUserId = authState.user.id
   const [editInputs, setEditInputs] = useState({
     content: "",
     post_image: "",
@@ -81,7 +85,7 @@ export default function Post(props: Props): JSX.Element {
       .delete(`/api/posts/${postId}`)
       .then(() => {
         props.setIsDoneDeleting(true)
-        props.getTimelines()
+        props.getTimelines(authUserId)
         setTimeout(() => props.setIsDoneDeleting(false), 3000)
       })
       .catch((e) => {
@@ -96,8 +100,33 @@ export default function Post(props: Props): JSX.Element {
         content,
       })
       .then(() => {
-        props.getTimelines()
+        props.getTimelines(authUserId)
         setIsOpenModal(false)
+      })
+      .catch((e) => {
+        console.error(e)
+      })
+  }
+
+  function likePost(postId) {
+    axios
+      .post(`/api/likes`, {
+        user_id: authUserId,
+        post_id: postId,
+      })
+      .then(() => {
+        props.getTimelines(authUserId)
+      })
+      .catch((e) => {
+        console.error(e)
+      })
+  }
+
+  function dislikePost(postId) {
+    axios
+      .delete(`/api/likes/${authUserId}/${postId}`)
+      .then(() => {
+        props.getTimelines(authUserId)
       })
       .catch((e) => {
         console.error(e)
@@ -106,9 +135,16 @@ export default function Post(props: Props): JSX.Element {
 
   const { disableButtonFlag } = errors
   const { content } = editInputs
-  const { userId, postId, postContent, postImage, username, profileImage } =
-    props
-  const { id } = authState.user
+  const {
+    userId,
+    postId,
+    postContent,
+    postImage,
+    username,
+    profileImage,
+    likedCount,
+    alreadyLiked,
+  } = props
 
   return (
     <div className={styles["post-wrapper"]}>
@@ -117,7 +153,7 @@ export default function Post(props: Props): JSX.Element {
           <ProfileImage profileImage={profileImage} />
           <span className={styles["post-user-section__name"]}>{username}</span>
         </div>
-        {userId === id && (
+        {userId === authUserId && (
           <Dropdown
             className={styles["post-dropdown"]}
             text={"..."}
@@ -185,6 +221,22 @@ export default function Post(props: Props): JSX.Element {
             alt={"Post image"}
           />
         )}
+        <div>
+          {alreadyLiked ? (
+            <FontAwesomeIcon
+              className={styles["liked-heart"]}
+              icon={faHeart}
+              onClick={() => dislikePost(postId)}
+            />
+          ) : (
+            <FontAwesomeIcon
+              className={styles["heart"]}
+              icon={farHeart}
+              onClick={() => likePost(postId)}
+            />
+          )}
+          <span className={styles["liked-count"]}>{likedCount}</span>
+        </div>
       </div>
     </div>
   )
