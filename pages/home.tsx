@@ -18,7 +18,9 @@ type Timeline = {
   content: string
   post_image: string
   profile_image: string
-  post_id: number
+  id: number
+  liked_count: number
+  already_liked: boolean
 }
 
 export default function Home(): JSX.Element {
@@ -41,12 +43,16 @@ export default function Home(): JSX.Element {
 
   useEffect(() => {
     setIsLoading(authState.isLoading)
-    getTimelines()
+    if (!authState.isLoading) {
+      getTimelines(authState.user.id)
+    }
   }, [authState.isLoading])
 
-  async function getTimelines() {
+  async function getTimelines(authUserId) {
     await axios
-      .get(`/api/posts`)
+      .post(`/api/get_posts`, {
+        auth_user_id: authUserId,
+      })
       .then((response: any) => {
         setTimelines(response.data)
       })
@@ -77,12 +83,12 @@ export default function Home(): JSX.Element {
   }
 
   function createPost() {
-    const { id } = authState.user
+    const authUserId = authState.user
     const { content, post_image } = postInputs
 
     axios
       .post(`/api/posts`, {
-        user_id: id,
+        user_id: authUserId,
         content,
         post_image,
       })
@@ -91,7 +97,7 @@ export default function Home(): JSX.Element {
           content: "",
           post_image: "",
         })
-        getTimelines()
+        getTimelines(authUserId)
         errors["disableButtonFlag"] = true
         setErrors({ ...errors })
         setIsDonePosting(true)
@@ -177,12 +183,14 @@ export default function Home(): JSX.Element {
             <Post
               key={index}
               userId={timeline.user_id}
-              postId={timeline.post_id}
+              postId={timeline.id}
               username={timeline.username}
               postContent={timeline.content}
               postImage={timeline.post_image}
               profileImage={timeline.profile_image}
-              getTimelines={() => getTimelines()}
+              likedCount={timeline.liked_count}
+              alreadyLiked={timeline.already_liked}
+              getTimelines={getTimelines}
               setIsDoneDeleting={setIsDoneDeleting}
             />
           )
