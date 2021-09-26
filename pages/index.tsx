@@ -5,9 +5,11 @@ import styles from "../styles/pages/index.module.scss"
 import { isEmpty } from "../utils/validations"
 import Link from "next/link"
 import { useRouter } from "next/router"
+import { Dimmer, Loader } from "semantic-ui-react"
 
 export default function Login(): JSX.Element {
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
   const [loginInputs, setLoginInputs] = useState({
     email: null,
     password: null,
@@ -49,6 +51,8 @@ export default function Login(): JSX.Element {
       return
     }
 
+    setIsLoading(true)
+
     await axios
       .post(`/api/auth/sign_in`, {
         email,
@@ -58,11 +62,11 @@ export default function Login(): JSX.Element {
         localStorage.setItem("access-token", response.headers["access-token"])
         localStorage.setItem("client", response.headers["client"])
         localStorage.setItem("uid", response.headers["uid"])
-
         router.push("/home")
       })
       .catch((e) => {
         console.error(e)
+        setIsLoading(false)
         if (e.response.status === 401) {
           return alert("メールアドレスもしくはパスワードが間違っています。")
         }
@@ -70,6 +74,16 @@ export default function Login(): JSX.Element {
           "何らかのエラーが発生しています。申し訳ありませんが時間を空けて再度お試し下さい。"
         )
       })
+  }
+
+  if (isLoading) {
+    return (
+      <Dimmer active={true} inverted>
+        <Loader inline="centered" size="huge">
+          Loading
+        </Loader>
+      </Dimmer>
+    )
   }
 
   const { isRequired } = errors
