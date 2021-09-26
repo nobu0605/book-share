@@ -261,9 +261,7 @@ export default function Home(): JSX.Element {
         </InfiniteScroll>
       </div>
 
-      <div className={styles["right-section"]}>
-        <p>dummy text dummy text dummy text dummy text dummy text</p>
-      </div>
+      <div className={styles["right-section"]}></div>
     </div>
   )
 }
