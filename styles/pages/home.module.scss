@@ -69,13 +69,37 @@
     margin-bottom: 10px;
   }
 
-  .create-post__input {
-    height: 100px;
-    margin-top: 5px;
+  .create-post__input-area {
+    background-color: white;
     margin-bottom: 10px;
+    padding: 35px;
+  }
+
+  .create-post__input {
+    height: 50px;
+    margin-top: 5px;
+    margin-bottom: 5px;
     border: none;
     width: 100%;
-    padding: 15px;
+  }
+
+  .create-post__image-icon-section {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .create-post__image-icon {
+    width: 20px;
+    height: 20px;
+    color: $main-color;
+  }
+
+  .preview-image-section {
+    margin-top: 15px;
+  }
+
+  .preview-image {
+    border-radius: 20px;
   }
 
   .action-message {
