@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from "react"
+import Image from "next/image"
 import styles from "../styles/pages/home.module.scss"
 import { AuthContext } from "../contexts/AuthContext"
 import axios from "../utils/axios"
@@ -10,8 +11,8 @@ import Link from "next/link"
 import InfiniteScroll from "react-infinite-scroller"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { library } from "@fortawesome/fontawesome-svg-core"
-import { faHome } from "@fortawesome/free-solid-svg-icons"
-library.add(faHome)
+import { faHome, faImage } from "@fortawesome/free-solid-svg-icons"
+library.add(faHome, faImage)
 
 type Timeline = {
   user_id: number
@@ -32,8 +33,9 @@ export default function Home(): JSX.Element {
   const [timelines, setTimelines] = useState([])
   const [postInputs, setPostInputs] = useState({
     content: "",
-    post_image: "",
+    post_picture: null,
   })
+  const [previewImage, setPreviewImage] = useState("")
   const [errors, setErrors] = useState({
     isRequired: {
       content: false,
@@ -105,24 +107,24 @@ export default function Home(): JSX.Element {
 
   function createPost() {
     const authUserId = authState.user.id
-    const { content, post_image } = postInputs
-
+    const { content, post_picture } = postInputs
+    const formData = new FormData()
+    formData.append("post_picture", post_picture)
+    formData.append("user_id", authUserId)
+    formData.append("content", content)
     axios
-      .post(`/api/posts`, {
-        user_id: authUserId,
-        content,
-        post_image,
-      })
+      .post(`/api/posts`, formData)
       .then((response: any) => {
         timelines.unshift(response.data)
         setTimelines([...timelines])
         setPostInputs({
           content: "",
-          post_image: "",
+          post_picture: null,
         })
         errors["disableButtonFlag"] = true
         setErrors({ ...errors })
         setIsDonePosting(true)
+        setPreviewImage("")
         setTimeout(() => setIsDonePosting(false), 2000)
       })
       .catch((e) => {
@@ -163,6 +165,15 @@ export default function Home(): JSX.Element {
     localStorage.removeItem("access-token")
     localStorage.removeItem("client")
     location.pathname = "/"
+  }
+
+  function handleChangeFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const { files, name } = e.target
+    setPreviewImage(window.URL.createObjectURL(files[0]))
+    setPostInputs({
+      ...postInputs,
+      [name]: files[0],
+    })
   }
 
   const loadMore = (page) => {
@@ -226,14 +237,43 @@ export default function Home(): JSX.Element {
             </Message>
           )}
           <div>
-            <input
-              className={styles["create-post__input"]}
-              type="text"
-              name="content"
-              value={content}
-              placeholder="いまどうしてる？"
-              onChange={(e) => handleChange(e)}
-            />
+            <div className={styles["create-post__input-area"]}>
+              <input
+                className={styles["create-post__input"]}
+                type="text"
+                name="content"
+                value={content}
+                placeholder="いまどうしてる？"
+                onChange={(e) => handleChange(e)}
+              />
+              <label>
+                <div className={styles["create-post__image-icon-section"]}>
+                  <FontAwesomeIcon
+                    icon="image"
+                    className={styles["create-post__image-icon"]}
+                  />
+                </div>
+                <input
+                  type="file"
+                  name="post_picture"
+                  accept=".jpg, .jpeg, .png"
+                  onChange={(e) => handleChangeFile(e)}
+                  style={{ display: "none" }}
+                />
+              </label>
+              {previewImage && (
+                <div className={styles["preview-image-section"]}>
+                  <Image
+                    className={styles["preview-image"]}
+                    width={170}
+                    height={240}
+                    loader={() => previewImage}
+                    src={previewImage}
+                    alt={"Preview image"}
+                  />
+                </div>
+              )}
+            </div>
           </div>
           <Button onClick={createPost} primary disabled={disableButtonFlag}>
             投稿する
