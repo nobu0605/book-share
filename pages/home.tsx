@@ -265,7 +265,6 @@ export default function Home(): JSX.Element {
               {previewImage && (
                 <div className={styles["preview-image-section"]}>
                   <Image
-                    className={styles["preview-image"]}
                     width={170}
                     height={240}
                     loader={() => previewImage}
