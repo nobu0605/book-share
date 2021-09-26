@@ -7,6 +7,7 @@ import ProfileImage from "../components/ProfileImage"
 import { Button, Message, Dropdown } from "semantic-ui-react"
 import { isEmpty } from "../utils/validations"
 import Link from "next/link"
+import InfiniteScroll from "react-infinite-scroller"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { library } from "@fortawesome/fontawesome-svg-core"
 import { faHome } from "@fortawesome/free-solid-svg-icons"
@@ -39,7 +40,10 @@ export default function Home(): JSX.Element {
     },
     disableButtonFlag: true,
   })
+  const [hasMore, setHasMore] = useState(true)
   const requiredField = ["content"]
+  const defaultNumberOfTimelines = 20
+  const defaultPageNumber = 0
 
   useEffect(() => {
     setIsLoading(authState.isLoading)
@@ -48,13 +52,30 @@ export default function Home(): JSX.Element {
     }
   }, [authState.isLoading])
 
-  async function getTimelines(authUserId) {
+  async function getTimelines(
+    authUserId: number,
+    page: number = defaultPageNumber
+  ) {
+    let currentPage = page
+    if (page > 0) {
+      // The page number starts from 0 in backend. So I subtract 1.
+      currentPage = page - 1
+    }
     await axios
       .post(`/api/get_posts`, {
         auth_user_id: authUserId,
+        page: currentPage,
       })
       .then((response: any) => {
-        setTimelines(response.data)
+        if (response.data.length < defaultNumberOfTimelines) {
+          setHasMore(false)
+        }
+        if (timelines.length === 0) {
+          setTimelines(response.data)
+          return
+        }
+        setTimelines(timelines.concat(response.data))
+        return
       })
       .catch((e) => {
         console.error(e)
@@ -83,7 +104,7 @@ export default function Home(): JSX.Element {
   }
 
   function createPost() {
-    const authUserId = authState.user
+    const authUserId = authState.user.id
     const { content, post_image } = postInputs
 
     axios
@@ -92,16 +113,45 @@ export default function Home(): JSX.Element {
         content,
         post_image,
       })
-      .then(() => {
+      .then((response: any) => {
+        timelines.unshift(response.data)
+        setTimelines([...timelines])
         setPostInputs({
           content: "",
           post_image: "",
         })
-        getTimelines(authUserId)
         errors["disableButtonFlag"] = true
         setErrors({ ...errors })
         setIsDonePosting(true)
-        setTimeout(() => setIsDonePosting(false), 3000)
+        setTimeout(() => setIsDonePosting(false), 2000)
+      })
+      .catch((e) => {
+        console.error(e)
+      })
+  }
+
+  function updateTimeline(valueObject: any, postIndex: number) {
+    Object.keys(valueObject).map(function (key) {
+      if (key === "liked_count") {
+        return (timelines[postIndex][key] =
+          timelines[postIndex][key] + valueObject[key])
+      }
+      return (timelines[postIndex][key] = valueObject[key])
+    })
+    setTimelines([...timelines])
+  }
+
+  function deletePost(postId: number, postIndex: number) {
+    if (!confirm("本当に削除しますか?")) {
+      return
+    }
+    axios
+      .delete(`/api/posts/${postId}`)
+      .then(() => {
+        setIsDoneDeleting(true)
+        timelines.splice(postIndex, 1)
+        setTimelines([...timelines])
+        setTimeout(() => setIsDoneDeleting(false), 2000)
       })
       .catch((e) => {
         console.error(e)
@@ -114,6 +164,17 @@ export default function Home(): JSX.Element {
     localStorage.removeItem("client")
     location.pathname = "/"
   }
+
+  const loadMore = (page) => {
+    const authUserId = authState.user.id
+    getTimelines(authUserId, page)
+  }
+
+  const loader = (
+    <div className="loader" key={0}>
+      Loading ...
+    </div>
+  )
 
   if (isLoading) {
     return null
@@ -178,23 +239,26 @@ export default function Home(): JSX.Element {
             投稿する
           </Button>
         </div>
-        {timelines.map((timeline: Timeline, index: number) => {
-          return (
-            <Post
-              key={index}
-              userId={timeline.user_id}
-              postId={timeline.id}
-              username={timeline.username}
-              postContent={timeline.content}
-              postImage={timeline.post_image}
-              profileImage={timeline.profile_image}
-              likedCount={timeline.liked_count}
-              alreadyLiked={timeline.already_liked}
-              getTimelines={getTimelines}
-              setIsDoneDeleting={setIsDoneDeleting}
-            />
-          )
-        })}
+        <InfiniteScroll loadMore={loadMore} hasMore={hasMore} loader={loader}>
+          {timelines.map((timeline: Timeline, postIndex: number) => {
+            return (
+              <Post
+                key={postIndex}
+                postIndex={postIndex}
+                userId={timeline.user_id}
+                postId={timeline.id}
+                username={timeline.username}
+                postContent={timeline.content}
+                postImage={timeline.post_image}
+                profileImage={timeline.profile_image}
+                likedCount={timeline.liked_count}
+                alreadyLiked={timeline.already_liked}
+                updateTimeline={updateTimeline}
+                deletePost={deletePost}
+              />
+            )
+          })}
+        </InfiniteScroll>
       </div>
 
       <div className={styles["right-section"]}>
