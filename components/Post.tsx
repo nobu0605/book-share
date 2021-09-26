@@ -215,7 +215,7 @@ export default function Post(props: Props): JSX.Element {
           <Image
             width={170}
             height={240}
-            src={`/post-image/${postImage}`}
+            src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/post-img/${postImage}`}
             alt={"Post image"}
           />
         )}
