@@ -9,6 +9,7 @@ import { Button, Message, Dropdown } from "semantic-ui-react"
 import { isEmpty } from "../utils/validations"
 import Link from "next/link"
 import InfiniteScroll from "react-infinite-scroller"
+import { Loader } from "semantic-ui-react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { library } from "@fortawesome/fontawesome-svg-core"
 import { faHome, faImage } from "@fortawesome/free-solid-svg-icons"
@@ -183,7 +184,7 @@ export default function Home(): JSX.Element {
 
   const loader = (
     <div className="loader" key={0}>
-      Loading ...
+      <Loader active inline />
     </div>
   )
 
