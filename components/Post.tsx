@@ -14,6 +14,7 @@ import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons"
 library.add(faTimesCircle, faHeart, farHeart)
 
 type Props = {
+  postIndex: number
   userId: number
   postId: number
   username: string
@@ -22,8 +23,8 @@ type Props = {
   profileImage: string
   likedCount: number
   alreadyLiked: boolean
-  getTimelines: (authUserId: number) => void
-  setIsDoneDeleting: (isDoneDeleting: boolean) => void
+  deletePost: (authUserId: number, postIndex: number) => void
+  updateTimeline: (valueObject: any, postIndex: number) => void
 }
 
 export default function Post(props: Props): JSX.Element {
@@ -77,30 +78,18 @@ export default function Post(props: Props): JSX.Element {
       })
   }
 
-  function deletePost(postId: number) {
-    if (!confirm("本当に削除しますか?")) {
-      return
-    }
-    axios
-      .delete(`/api/posts/${postId}`)
-      .then(() => {
-        props.setIsDoneDeleting(true)
-        props.getTimelines(authUserId)
-        setTimeout(() => props.setIsDoneDeleting(false), 3000)
-      })
-      .catch((e) => {
-        console.error(e)
-      })
-  }
-
-  function updatePost(postId: number) {
+  function updatePost(postId: number, postIndex: number) {
     const { content } = editInputs
     axios
       .patch(`/api/posts/${postId}`, {
         content,
       })
       .then(() => {
-        props.getTimelines(authUserId)
+        props.updateTimeline(editInputs, postIndex)
+        setEditInputs({
+          content: "",
+          post_image: "",
+        })
         setIsOpenModal(false)
       })
       .catch((e) => {
@@ -108,25 +97,33 @@ export default function Post(props: Props): JSX.Element {
       })
   }
 
-  function likePost(postId) {
+  function likePost(postId: number, postIndex: number) {
     axios
       .post(`/api/likes`, {
         user_id: authUserId,
         post_id: postId,
       })
       .then(() => {
-        props.getTimelines(authUserId)
+        const liked = {
+          already_liked: true,
+          liked_count: 1,
+        }
+        props.updateTimeline(liked, postIndex)
       })
       .catch((e) => {
         console.error(e)
       })
   }
 
-  function dislikePost(postId) {
+  function dislikePost(postId: number, postIndex: number) {
     axios
       .delete(`/api/likes/${authUserId}/${postId}`)
       .then(() => {
-        props.getTimelines(authUserId)
+        const disliked = {
+          already_liked: false,
+          liked_count: -1,
+        }
+        props.updateTimeline(disliked, postIndex)
       })
       .catch((e) => {
         console.error(e)
@@ -136,6 +133,7 @@ export default function Post(props: Props): JSX.Element {
   const { disableButtonFlag } = errors
   const { content } = editInputs
   const {
+    postIndex,
     userId,
     postId,
     postContent,
@@ -166,7 +164,7 @@ export default function Post(props: Props): JSX.Element {
               />
               <Dropdown.Item
                 text="投稿を削除"
-                onClick={() => deletePost(postId)}
+                onClick={() => props.deletePost(postId, postIndex)}
               />
             </Dropdown.Menu>
           </Dropdown>
@@ -202,7 +200,7 @@ export default function Post(props: Props): JSX.Element {
             />
             <Button
               className={styles["edit-modal__button"]}
-              onClick={() => updatePost(postId)}
+              onClick={() => updatePost(postId, postIndex)}
               primary
               disabled={disableButtonFlag}
             >
@@ -226,13 +224,13 @@ export default function Post(props: Props): JSX.Element {
             <FontAwesomeIcon
               className={styles["liked-heart"]}
               icon={faHeart}
-              onClick={() => dislikePost(postId)}
+              onClick={() => dislikePost(postId, postIndex)}
             />
           ) : (
             <FontAwesomeIcon
               className={styles["heart"]}
               icon={farHeart}
-              onClick={() => likePost(postId)}
+              onClick={() => likePost(postId, postIndex)}
             />
           )}
           <span className={styles["liked-count"]}>{likedCount}</span>
