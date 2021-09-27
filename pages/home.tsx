@@ -34,7 +34,7 @@ export default function Home(): JSX.Element {
   const [timelines, setTimelines] = useState([])
   const [postInputs, setPostInputs] = useState({
     content: "",
-    post_picture: null,
+    post_picture: "",
   })
   const [previewImage, setPreviewImage] = useState("")
   const [errors, setErrors] = useState({
@@ -120,7 +120,7 @@ export default function Home(): JSX.Element {
         setTimelines([...timelines])
         setPostInputs({
           content: "",
-          post_picture: null,
+          post_picture: "",
         })
         errors["disableButtonFlag"] = true
         setErrors({ ...errors })
