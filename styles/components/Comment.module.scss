@@ -1,6 +1,6 @@
 @import "../variables";
 
-.post-wrapper {
+.comment-wrapper {
   width: 100%;
   display: flex;
   justify-content: center;
@@ -10,9 +10,8 @@
   margin-top: 10px;
   margin-bottom: 10px;
   padding: 15px;
-  cursor: pointer;
 
-  .post-user-section {
+  .comment-user-section {
     width: 100%;
     text-align: left;
     color: black;
@@ -20,22 +19,22 @@
     justify-content: space-between;
   }
 
-  .post-user-section-left {
+  .comment-user-section-left {
     display: flex;
     align-items: center;
   }
 
-  .post-user-section__name {
+  .comment-user-section__name {
     font-size: 15px;
     margin-left: 10px;
   }
 
-  .post-dropdown {
+  .comment-dropdown {
     height: 30px;
     float: right;
   }
 
-  .post-content {
+  .comment-content {
     font-size: 15px;
     text-align: center;
     margin-top: 15px;
@@ -44,34 +43,6 @@
     color: black;
     display: flex;
     flex-direction: column;
-  }
-
-  .comment-icon {
-    width: 15px;
-    height: 15px;
-    cursor: pointer;
-  }
-
-  .commented-count {
-    margin-right: 10px;
-  }
-
-  .count-text {
-    margin-left: 5px;
-  }
-
-  .liked-heart {
-    width: 15px;
-    height: 15px;
-    color: rgb(249, 24, 128);
-    cursor: pointer;
-  }
-
-  .heart {
-    width: 15px;
-    height: 15px;
-    color: rgb(83, 100, 113);
-    cursor: pointer;
   }
 }
 

@@ -7,11 +7,14 @@ import axios from "../utils/axios"
 import { Modal, Button } from "semantic-ui-react"
 import { isEmpty } from "../utils/validations"
 import { AuthContext } from "../contexts/AuthContext"
+import CommentModal from "./CommentModal"
+import { useRouter } from "next/router"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { library } from "@fortawesome/fontawesome-svg-core"
 import { faTimesCircle, faHeart } from "@fortawesome/free-solid-svg-icons"
 import { faHeart as farHeart } from "@fortawesome/free-regular-svg-icons"
-library.add(faTimesCircle, faHeart, farHeart)
+import { faComment as farComment } from "@fortawesome/free-regular-svg-icons"
+library.add(faTimesCircle, faHeart, farHeart, farComment)
 
 type Props = {
   postIndex: number
@@ -23,14 +26,15 @@ type Props = {
   profileImage: string
   likedCount: number
   alreadyLiked: boolean
-  deletePost: (authUserId: number, postIndex: number) => void
-  updateTimeline: (valueObject: any, postIndex: number) => void
+  commentedCount: number
+  deletePost: (postId: number, postIndex: number) => void
+  updatePosts: (valueObject: any, postIndex: number) => void
 }
 
 export default function Post(props: Props): JSX.Element {
   const { authState } = useContext(AuthContext)
   const authUserId = authState.user.id
-  const [editInputs, setEditInputs] = useState({
+  const [postInputs, setPostInputs] = useState({
     content: "",
     post_image: "",
   })
@@ -40,7 +44,9 @@ export default function Post(props: Props): JSX.Element {
     },
     disableButtonFlag: true,
   })
-  const [isOpenModal, setIsOpenModal] = useState(false)
+  const [isOpenEditPostModal, setIsOpenEditPostModal] = useState(false)
+  const [isOpenCommentModal, setIsOpenCommentModal] = useState(false)
+  const router = useRouter()
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const name = event.target.name
@@ -57,8 +63,8 @@ export default function Post(props: Props): JSX.Element {
     }
 
     setErrors({ ...errors })
-    setEditInputs({
-      ...editInputs,
+    setPostInputs({
+      ...postInputs,
       [name]: value,
     })
   }
@@ -67,30 +73,30 @@ export default function Post(props: Props): JSX.Element {
     await axios
       .get(`/api/posts/${postId}`)
       .then((response: any) => {
-        setEditInputs({
+        setPostInputs({
           content: response.data.content,
           post_image: response.data.post_image,
         })
-        setIsOpenModal(true)
+        setIsOpenEditPostModal(true)
       })
       .catch((e) => {
         console.error(e)
       })
   }
 
-  function updatePost(postId: number, postIndex: number) {
-    const { content } = editInputs
+  function editPost(postId: number, postIndex: number) {
+    const { content } = postInputs
     axios
       .patch(`/api/posts/${postId}`, {
         content,
       })
       .then(() => {
-        props.updateTimeline(editInputs, postIndex)
-        setEditInputs({
+        props.updatePosts(postInputs, postIndex)
+        setPostInputs({
           content: "",
           post_image: "",
         })
-        setIsOpenModal(false)
+        setIsOpenEditPostModal(false)
       })
       .catch((e) => {
         console.error(e)
@@ -108,7 +114,7 @@ export default function Post(props: Props): JSX.Element {
           already_liked: true,
           liked_count: 1,
         }
-        props.updateTimeline(liked, postIndex)
+        props.updatePosts(liked, postIndex)
       })
       .catch((e) => {
         console.error(e)
@@ -123,7 +129,7 @@ export default function Post(props: Props): JSX.Element {
           already_liked: false,
           liked_count: -1,
         }
-        props.updateTimeline(disliked, postIndex)
+        props.updatePosts(disliked, postIndex)
       })
       .catch((e) => {
         console.error(e)
@@ -131,7 +137,7 @@ export default function Post(props: Props): JSX.Element {
   }
 
   const { disableButtonFlag } = errors
-  const { content } = editInputs
+  const { content } = postInputs
   const {
     postIndex,
     userId,
@@ -142,72 +148,82 @@ export default function Post(props: Props): JSX.Element {
     profileImage,
     likedCount,
     alreadyLiked,
+    commentedCount,
   } = props
 
   return (
-    <div className={styles["post-wrapper"]}>
+    <div
+      className={styles["post-wrapper"]}
+      onClick={() => router.push(`/post/${postId}`)}
+    >
       <div className={styles["post-user-section"]}>
         <div className={styles["post-user-section-left"]}>
           <ProfileImage profileImage={profileImage} />
           <span className={styles["post-user-section__name"]}>{username}</span>
         </div>
-        {userId === authUserId && (
-          <Dropdown
-            className={styles["post-dropdown"]}
-            text={"..."}
-            icon={null}
-          >
-            <Dropdown.Menu>
-              <Dropdown.Item
-                text="投稿を編集"
-                onClick={() => getPost(postId)}
-              />
-              <Dropdown.Item
-                text="投稿を削除"
-                onClick={() => props.deletePost(postId, postIndex)}
-              />
-            </Dropdown.Menu>
-          </Dropdown>
-        )}
-        <Modal
-          onClose={() => setIsOpenModal(false)}
-          onOpen={() => setIsOpenModal(true)}
-          open={isOpenModal}
-          closeOnDimmerClick={false}
-          size={"tiny"}
+        <div
+          onClick={(e) => {
+            e.stopPropagation()
+          }}
         >
-          <div className={styles["edit-modal"]}>
-            <div className={styles["edit-modal__circle"]}>
-              <FontAwesomeIcon
-                className={styles["edit-modal__circle-icon"]}
-                icon="times-circle"
-                onClick={() => setIsOpenModal(false)}
-              />
-            </div>
-            <span className={styles["edit-modal__title"]}>投稿を編集</span>
-            <div className={styles["edit-modal__profile"]}>
-              <ProfileImage profileImage={profileImage} />
-              <span className={styles["edit-modal__profile-name"]}>
-                {username}
-              </span>
-            </div>
-            <input
-              type="text"
-              name="content"
-              value={content}
-              onChange={(e) => handleChange(e)}
-              className={styles["edit-modal__input"]}
-            />
-            <Button
-              className={styles["edit-modal__button"]}
-              onClick={() => updatePost(postId, postIndex)}
-              primary
-              disabled={disableButtonFlag}
+          {userId === authUserId && (
+            <Dropdown
+              className={styles["post-dropdown"]}
+              text={"..."}
+              icon={null}
             >
-              保存する
-            </Button>
-          </div>
-        </Modal>
+              <Dropdown.Menu>
+                <Dropdown.Item
+                  text="投稿を編集"
+                  onClick={() => getPost(postId)}
+                />
+                <Dropdown.Item
+                  text="投稿を削除"
+                  onClick={() => props.deletePost(postId, postIndex)}
+                />
+              </Dropdown.Menu>
+            </Dropdown>
+          )}
+          <Modal
+            onClose={() => setIsOpenEditPostModal(false)}
+            onOpen={() => setIsOpenEditPostModal(true)}
+            open={isOpenEditPostModal}
+            closeOnDimmerClick={false}
+            size={"tiny"}
+          >
+            <div className={styles["edit-modal"]}>
+              <div className={styles["edit-modal__circle"]}>
+                <FontAwesomeIcon
+                  className={styles["edit-modal__circle-icon"]}
+                  icon="times-circle"
+                  onClick={() => setIsOpenEditPostModal(false)}
+                />
+              </div>
+              <span className={styles["edit-modal__title"]}>投稿を編集</span>
+              <div className={styles["edit-modal__profile"]}>
+                <ProfileImage profileImage={profileImage} />
+                <span className={styles["edit-modal__profile-name"]}>
+                  {username}
+                </span>
+              </div>
+              <input
+                type="text"
+                name="content"
+                value={content}
+                onChange={(e) => handleChange(e)}
+                className={styles["edit-modal__input"]}
+              />
+              <Button
+                className={styles["edit-modal__button"]}
+                onClick={() => editPost(postId, postIndex)}
+                primary
+                disabled={disableButtonFlag}
+              >
+                保存する
+              </Button>
+            </div>
+          </Modal>
+        </div>
       </div>
       <div>
         <span className={styles["post-content"]}>{postContent}</span>
@@ -219,7 +235,31 @@ export default function Post(props: Props): JSX.Element {
             alt={"Post image"}
           />
         )}
-        <div>
+        <div
+          onClick={(e) => {
+            e.stopPropagation()
+          }}
+        >
+          <FontAwesomeIcon
+            className={styles["comment-icon"]}
+            icon={farComment}
+            onClick={() => setIsOpenCommentModal(true)}
+          />
+          <span
+            className={`${styles["count-text"]} ${styles["commented-count"]}`}
+          >
+            {commentedCount}
+          </span>
+          <CommentModal
+            postProfileImage={profileImage}
+            postUsername={username}
+            postContent={postContent}
+            postId={postId}
+            postIndex={postIndex}
+            isOpenCommentModal={isOpenCommentModal}
+            setIsOpenCommentModal={setIsOpenCommentModal}
+            updatePosts={props.updatePosts}
+          />
           {alreadyLiked ? (
             <FontAwesomeIcon
               className={styles["liked-heart"]}
@@ -233,7 +273,7 @@ export default function Post(props: Props): JSX.Element {
               onClick={() => likePost(postId, postIndex)}
             />
           )}
-          <span className={styles["liked-count"]}>{likedCount}</span>
+          <span className={styles["count-text"]}>{likedCount}</span>
         </div>
       </div>
     </div>
