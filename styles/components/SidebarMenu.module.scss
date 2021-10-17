@@ -1,0 +1,41 @@
+.sidebar-menu {
+  width: 30%;
+}
+
+.sidebar-navigation {
+  display: flex;
+  flex-direction: column;
+  margin-left: 30px;
+  margin-right: 30px;
+  font-size: 15px;
+  margin: 10px;
+  position: fixed;
+  width: 30%;
+}
+
+.sidebar-menu-link {
+  margin: 0 auto;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  width: 50%;
+}
+
+.sidebar-menu-home-link {
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-menu__home-icon {
+  width: 15px;
+  height: 15px;
+  margin-right: 5px;
+}
+
+.sidebar-menu-profile {
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-menu-profile__name {
+  margin-left: 10px;
+}

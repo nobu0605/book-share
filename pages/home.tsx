@@ -4,16 +4,15 @@ import styles from "../styles/pages/home.module.scss"
 import { AuthContext } from "../contexts/AuthContext"
 import axios from "../utils/axios"
 import Post from "../components/Post"
-import ProfileImage from "../components/ProfileImage"
-import { Button, Message, Dropdown } from "semantic-ui-react"
+import SidebarMenu from "../components/SidebarMenu"
+import { Button, Message } from "semantic-ui-react"
 import { isEmpty } from "../utils/validations"
-import Link from "next/link"
 import InfiniteScroll from "react-infinite-scroller"
 import { Loader } from "semantic-ui-react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { library } from "@fortawesome/fontawesome-svg-core"
-import { faHome, faImage } from "@fortawesome/free-solid-svg-icons"
-library.add(faHome, faImage)
+import { faImage } from "@fortawesome/free-solid-svg-icons"
+library.add(faImage)
 
 type Timeline = {
   user_id: number
@@ -24,6 +23,7 @@ type Timeline = {
   id: number
   liked_count: number
   already_liked: boolean
+  commented_count: number
 }
 
 export default function Home(): JSX.Element {
@@ -133,9 +133,9 @@ export default function Home(): JSX.Element {
       })
   }
 
-  function updateTimeline(valueObject: any, postIndex: number) {
+  function updatePosts(valueObject: any, postIndex: number) {
     Object.keys(valueObject).map(function (key) {
-      if (key === "liked_count") {
+      if (key === "liked_count" || key === "commented_count") {
         return (timelines[postIndex][key] =
           timelines[postIndex][key] + valueObject[key])
       }
@@ -161,13 +161,6 @@ export default function Home(): JSX.Element {
       })
   }
 
-  function logout(): void {
-    localStorage.removeItem("uid")
-    localStorage.removeItem("access-token")
-    localStorage.removeItem("client")
-    location.pathname = "/"
-  }
-
   function handleChangeFile(e: React.ChangeEvent<HTMLInputElement>) {
     const { files, name } = e.target
     setPreviewImage(window.URL.createObjectURL(files[0]))
@@ -178,6 +171,10 @@ export default function Home(): JSX.Element {
   }
 
   const loadMore = (page) => {
+    if (timelines.length === 0) {
+      return
+    }
+
     const authUserId = authState.user.id
     getTimelines(authUserId, page)
   }
@@ -192,41 +189,12 @@ export default function Home(): JSX.Element {
     return null
   }
 
-  const { username, profile_image } = authState.user
   const { content } = postInputs
   const { disableButtonFlag } = errors
 
   return (
     <div className={styles["home-wrapper"]}>
-      <div className={styles["sidebar-menu"]}>
-        <nav className={styles["sidebar-navigation"]}>
-          <div
-            className={`${styles["sidebar-menu-link"]} ${styles["sidebar-menu-profile"]}`}
-          >
-            <ProfileImage profileImage={profile_image} />
-            <span className={styles["sidebar-menu-profile__name"]}>
-              {username}
-            </span>
-          </div>
-          <Link href={`/home`}>
-            <a
-              className={`${styles["sidebar-menu-link"]} ${styles["sidebar-menu-home-link"]}`}
-            >
-              <FontAwesomeIcon
-                icon="home"
-                className={styles["sidebar-menu__home-icon"]}
-              />
-              <span>ホーム</span>
-            </a>
-          </Link>
-          <Dropdown className={styles["sidebar-menu-link"]} text={"アカウント"}>
-            <Dropdown.Menu>
-              <Dropdown.Item text="Logout" onClick={logout} />
-            </Dropdown.Menu>
-          </Dropdown>
-        </nav>
-      </div>
-
+      <SidebarMenu />
       <div className={styles["timeline-section"]}>
         <div className={styles["create-post"]}>
           {isDonePosting && (
@@ -293,7 +261,8 @@ export default function Home(): JSX.Element {
                 profileImage={timeline.profile_image}
                 likedCount={timeline.liked_count}
                 alreadyLiked={timeline.already_liked}
-                updateTimeline={updateTimeline}
+                commentedCount={timeline.commented_count}
+                updatePosts={updatePosts}
                 deletePost={deletePost}
               />
             )

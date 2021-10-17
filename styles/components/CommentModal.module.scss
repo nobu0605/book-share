@@ -1,0 +1,65 @@
+@import "../variables";
+
+.comment-modal-wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  height: 200px;
+  font-size: 15px;
+
+  .comment-modal__title {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .comment-modal__circle {
+    text-align: right;
+    font-size: 15px;
+  }
+  .comment-modal__circle-icon {
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+  }
+
+  .comment-modal__profile {
+    text-align: left;
+    color: black;
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .comment-modal__profile-name {
+    font-size: 15px;
+    margin-left: 10px;
+  }
+
+  .comment-modal__input {
+    margin-bottom: 15px;
+    height: 200px;
+    border: 1px solid rgb(221, 221, 221);
+  }
+
+  .comment-modal__button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.action-message {
+  z-index: 100;
+  position: fixed !important;
+  left: 40%;
+  right: 40%;
+  bottom: 20px;
+  width: 20%;
+  margin-top: 20px;
+  color: white !important;
+  font-size: 1.14285714em;
+  font-weight: 600;
+  background-color: $main-color !important;
+}
