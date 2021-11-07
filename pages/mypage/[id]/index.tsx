@@ -150,7 +150,10 @@ export default function Mypage(): JSX.Element {
 
   function editUser() {
     const authUserId = authState.user.id
-    const { username, self_introduction, profile_image } = profileInputs
+    const { username, profile_image } = profileInputs
+    const self_introduction = profileInputs.self_introduction
+      ? profileInputs.self_introduction
+      : ""
     const formData = new FormData()
     formData.append("user_id", authUserId)
     formData.append("profile_image", profile_image)
@@ -326,10 +329,11 @@ export default function Mypage(): JSX.Element {
                   <label htmlFor="username">自己紹介</label>
                   <textarea
                     name="self_introduction"
-                    value={profileInputs.self_introduction}
                     onChange={(e) => handleChange(e)}
                     className={styles["edit-modal__input-self-introduction"]}
-                  />
+                  >
+                    {profileInputs.self_introduction}
+                  </textarea>
                   <ErrorMessage
                     isError={isRequired.self_introduction}
                     errorMessage={"自己紹介は入力必須項目です。"}
