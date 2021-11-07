@@ -6,6 +6,7 @@ import Image from "next/image"
 import axios from "../../../utils/axios"
 import { isEmpty } from "../../../utils/validations"
 import Comment from "../../../components/Comment"
+import UserSection from "../../../components/UserSection"
 import SidebarMenu from "../../../components/SidebarMenu"
 import CommentModal from "../../../components/CommentModal"
 import ProfileImage from "../../../components/ProfileImage"
@@ -219,12 +220,7 @@ export default function PostPage(): JSX.Element {
         )}
         <div className={styles["post-wrapper"]}>
           <div className={styles["post-user-section"]}>
-            <div className={styles["post-user-section-left"]}>
-              <ProfileImage profileImage={profile_image} />
-              <span className={styles["post-user-section__name"]}>
-                {username}
-              </span>
-            </div>
+            <UserSection username={username} profileImage={profile_image} />
             <div>
               {user_id === authState.user.id && (
                 <Dropdown
