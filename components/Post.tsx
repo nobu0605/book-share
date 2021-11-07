@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react"
 import styles from "../styles/components/Post.module.scss"
 import Image from "next/image"
 import ProfileImage from "./ProfileImage"
+import UserSection from "./UserSection"
 import { Dropdown } from "semantic-ui-react"
 import axios from "../utils/axios"
 import { Modal, Button } from "semantic-ui-react"
@@ -157,10 +158,7 @@ export default function Post(props: Props): JSX.Element {
       onClick={() => router.push(`/post/${postId}`)}
     >
       <div className={styles["post-user-section"]}>
-        <div className={styles["post-user-section-left"]}>
-          <ProfileImage profileImage={profileImage} />
-          <span className={styles["post-user-section__name"]}>{username}</span>
-        </div>
+        <UserSection username={username} profileImage={profileImage} />
         <div
           onClick={(e) => {
             e.stopPropagation()

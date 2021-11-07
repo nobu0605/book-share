@@ -4,8 +4,8 @@ import styles from "../styles/components/Comment.module.scss"
 import axios from "../utils/axios"
 import { isEmpty } from "../utils/validations"
 import ProfileImage from "../components/ProfileImage"
-import { Dropdown } from "semantic-ui-react"
-import { Modal, Button } from "semantic-ui-react"
+import UserSection from "./UserSection"
+import { Modal, Button, Dropdown } from "semantic-ui-react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { library } from "@fortawesome/fontawesome-svg-core"
 import { faTimesCircle } from "@fortawesome/free-solid-svg-icons"
@@ -104,12 +104,7 @@ export default function Comment(props: Props): JSX.Element {
     <div className={styles["comment-wrapper"]}>
       <span>返信先: {postAuthorName} さん</span>
       <div className={styles["comment-user-section"]}>
-        <div className={styles["comment-user-section-left"]}>
-          <ProfileImage profileImage={profileImage} />
-          <span className={styles["comment-user-section__name"]}>
-            {username}
-          </span>
-        </div>
+        <UserSection username={username} profileImage={profileImage} />
         <div>
           {userId === authState.user.id && (
             <Dropdown

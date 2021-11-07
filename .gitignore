@@ -34,5 +34,5 @@ yarn-error.log*
 .vercel
 
 # public
-/public/profile-image/*
-!/public/profile-image/default-profile-image.png
+/public/profile-img/*
+!/public/profile-img/default-profile-image.png
