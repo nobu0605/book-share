@@ -22,14 +22,18 @@ export default function SidebarMenu(): JSX.Element {
   return (
     <div className={styles["sidebar-menu"]}>
       <nav className={styles["sidebar-navigation"]}>
-        <div
-          className={`${styles["sidebar-menu-link"]} ${styles["sidebar-menu-profile"]}`}
-        >
-          <ProfileImage profileImage={authState.user.profile_image} />
-          <span className={styles["sidebar-menu-profile__name"]}>
-            {authState.user.username}
-          </span>
-        </div>
+        <Link href={`/mypage/${authState.user.id}`}>
+          <a>
+            <div
+              className={`${styles["sidebar-menu-link"]} ${styles["sidebar-menu-profile"]}`}
+            >
+              <ProfileImage profileImage={authState.user.profile_image} />
+              <span className={styles["sidebar-menu-profile__name"]}>
+                {authState.user.username}
+              </span>
+            </div>
+          </a>
+        </Link>
         <Link href={`/home`}>
           <a
             className={`${styles["sidebar-menu-link"]} ${styles["sidebar-menu-home-link"]}`}

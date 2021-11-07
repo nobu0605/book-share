@@ -9,6 +9,11 @@ export function isValidEmail(email: string): boolean {
   return regex.test(email)
 }
 
+export function isValidSelfIntro(selfIntro: string): boolean {
+  const maxLength = 160
+  return selfIntro.length <= maxLength
+}
+
 export function isEmpty(value: string | number | null): boolean {
   return value === "" || typeof value === "undefined" || value === null
 }
