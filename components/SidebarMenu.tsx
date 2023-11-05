@@ -7,7 +7,8 @@ import styles from "../styles/components/SidebarMenu.module.scss"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { library } from "@fortawesome/fontawesome-svg-core"
 import { faHome } from "@fortawesome/free-solid-svg-icons"
-library.add(faHome)
+import { faEnvelope } from "@fortawesome/free-solid-svg-icons"
+library.add(faHome, faEnvelope)
 
 export default function SidebarMenu(): JSX.Element {
   const { authState } = useContext(AuthContext)
@@ -36,13 +37,24 @@ export default function SidebarMenu(): JSX.Element {
         </Link>
         <Link href={`/home`}>
           <a
-            className={`${styles["sidebar-menu-link"]} ${styles["sidebar-menu-home-link"]}`}
+            className={`${styles["sidebar-menu-link"]} ${styles["sidebar-menu-icon-link"]}`}
           >
             <FontAwesomeIcon
               icon="home"
-              className={styles["sidebar-menu__home-icon"]}
+              className={styles["sidebar-menu__icon"]}
             />
             <span>ホーム</span>
+          </a>
+        </Link>
+        <Link href={`/message`}>
+          <a
+            className={`${styles["sidebar-menu-link"]} ${styles["sidebar-menu-icon-link"]}`}
+          >
+            <FontAwesomeIcon
+              icon="envelope"
+              className={styles["sidebar-menu__icon"]}
+            />
+            <span>メッセージ</span>
           </a>
         </Link>
         <Dropdown className={styles["sidebar-menu-link"]} text={"アカウント"}>
